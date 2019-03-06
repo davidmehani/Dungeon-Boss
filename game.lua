@@ -153,7 +153,8 @@ end
 function draw(x,y)
 	cls()
 	map(x,y,30,17)
-	print("LIVES:" .. " " .. tostring(player.lives), 10, 12)
+	print("LIVES: " .. tostring(player.lives), 10, 12)
+	print("SCORE: " .. tostring(player.score), 180, 12)
 	if #enemys > 0 then
 		for id, enemy in pairs(enemys) do
 			spr(18, enemy.x * 8, enemy.y * 8, 11)
@@ -372,4 +373,3 @@ t = t + 1
 		menu()
 	end
 end
-
