@@ -11,7 +11,7 @@ red = 2
 dirt = 3
 water = 4
 wall = 5
-guy = 6
+guy = 25
 flag = 7
 
 minX = 1
@@ -24,11 +24,11 @@ ne = {x = 1, y=-1} -- NORTH EAST
 d  = {x = 0, y = 1} -- DOWN
 se = {x = 1, y = 1} -- SOUTH EAST
 l = {x =-1, y = 0} -- LEFT
-nw = {x = -1, y = 1} -- NORTH WEST 
+nw = {x = -1, y = 1} -- NORTH WEST
 r = {x = 1, y = 0} -- RIGHT
 sw = {x = 1, y = 1} -- SOUTH WEST
 
-dirs = {u,d,l,r,ne,se,nw,sw} -- DIRECTIONS 
+dirs = {u,d,l,r,ne,se,nw,sw} -- DIRECTIONS
 enemys = {}
 bullets = {}
 
@@ -36,7 +36,7 @@ function init()
 
 solids = {[5] = true}
 
-player = 
+player =
 	{
 		x = 8,
 		y = 10,
@@ -48,9 +48,10 @@ player =
 		level = 0,
 		vulnerable = true,
 		lives = 3,
+		dir = 1,
 	}
-	
-pole = 
+
+pole =
 {
 	x = math.random(1,28) * 8,
 	y = math.random(1,15) * 8,
@@ -62,10 +63,10 @@ t = 0
 gameOver = false
 mode = "menu"
 end
-	
+
 -- FUNCTIONS
 function spawnBullet() -- UNFINISHED
-	
+
 	local b = {
 		x = player.x+1,
 		y = player.y,
@@ -73,7 +74,7 @@ function spawnBullet() -- UNFINISHED
 		width = 8,
 		d = r,
 	}
-	
+
 	table.insert(bullets, #bullets+1,b)
 end
 
@@ -85,25 +86,25 @@ if btn(4) then
 		if mget(bullet.x,bullet.y) == wall then
 			table.remove(bullets,id)
 		end
-			if btn(2) then 
+			if btn(2) then
 				bullet.d = u
 			elseif btn(3) then
 				bullet.d = d
 			else
 				bullet.d = {x = 0, y = 0}
 			end
-	
-			if btn(0) then 
+
+			if btn(0) then
 				bullet.d = l
 				elseif btn(1) then
 					bullet.d = r
 			else
 				bullet.d = {x = 0, y = 0}
 			end
-	
+
 			local tx = bullet.x + bullet.d.x
 			local ty = bullet.y + bullet.d.y
-	
+
 			if mget(bullet.x,bullet.y) == wall then
 				table.remove(bullets,id)
 			else
@@ -121,7 +122,7 @@ function spawn()
 	if mget(tx,ty) >= wall then
 		spawn()
 	end
-	
+
 	local z = {
 		x = tx,
 		y = ty,
@@ -137,17 +138,37 @@ function moveEnemy()
 		if mget(enemy.x,enemy.y) >= wall then
 			table.remove(enemys,id)
 		end
-	
+
 		local tx = enemy.x + enemy.d.x
 		local ty = enemy.y + enemy.d.y
-	
+
 		if mget(tx,ty) >= wall then
 			enemy.d = dirs[math.random(1,8)]
 		else
 			enemy.x = tx
 			enemy.y = ty
 		end
-	end 
+	end
+end
+
+function orientGuy()
+	if player.dir == 1 then
+		guy = 6
+	elseif player.dir == 2 then
+		guy = 9
+	elseif player.dir == 3 then
+		guy = 24
+	elseif player.dir == 4 then
+		guy = 8
+	elseif player.dir == 5 then
+		guy = 23
+	elseif player.dir == 6 then
+		guy = 25
+	elseif player.dir == 7 then
+		guy = 26
+	elseif player.dir == 8 then
+		guy = 10
+	end
 end
 
 function draw(x,y)
@@ -160,6 +181,7 @@ function draw(x,y)
 			spr(18, enemy.x * 8, enemy.y * 8, 11)
 		end
 	end
+	orientGuy()
 	spr(guy, player.x, player.y, 11)
 	spr(flag, pole.x, pole.y, 11)
 	if #bullets > 0 and #bullets < 3 then -- only appears once
@@ -176,34 +198,62 @@ end
 
 function moveplayer()
 
-	if btn(2) then 
+	if btn(2) then
 		player.vx = -1
+		player.dir = 3
+		if btn(0) then
+			player.dir = 7
+		end
+		if btn(1) then
+			player.dir = 8
+		end
 	elseif btn(3) then
 		player.vx = 1
+		player.dir = 4
+		if btn(0) then
+			player.dir = 5
+		end
+		if btn(1) then
+			player.dir = 6
+		end
 	else
 		player.vx = 0
 	end
-	
-	if btn(0) then 
+
+	if btn(0) then
 		player.vy = -1
+		player.dir = 1
+		if btn(3) then
+			player.dir = 5
+		end
+		if btn(2) then
+			player.dir = 7
+		end
 	elseif btn(1) then
 		player.vy = 1
+		player.dir = 2
+		if btn(3) then
+			player.dir = 6
+		end
+		if btn(2) then
+			player.dir = 8
+		end
 	else
 		player.vy = 0
 	end
-	
+
 	if solid(player.x+player.vx,player.y+player.vy) or solid(player.x+7+player.vx,player.y+player.vy) or solid(player.x+player.vx,player.y+7+player.vy) or solid(player.x+7+player.vx,player.y+7+player.vy) then
     player.vx=0
 	end
-	
+
 	if solid(player.x+player.vx,player.y+8+player.vy) or solid(player.x+7+player.vx,player.y+8+player.vy) or solid(player.x + player.vx, player.y + player.vy) or solid(player.x + 7 + player.vx, player.y + player.vy) then
     player.vy=0
 	end
-	
+
 	player.x=player.x+player.vx
  player.y=player.y+player.vy
 
-end	
+end
 
 function collision(a,b)
  -- get parameters from a and b
@@ -270,7 +320,7 @@ function enemyCollision()
 				end
 				player.vulnerable = false
 			end
-		end	
+		end
 	end
 	--end enemy collision
 end
@@ -279,7 +329,7 @@ function menu()
 	cls()
 	map(30,17,30,17)
 	print("Press Z to Start", 8*8, 12*8, 2)
-	if btn(4)then 
+	if btn(4)then
 		mode = "game"
 	end
 end
